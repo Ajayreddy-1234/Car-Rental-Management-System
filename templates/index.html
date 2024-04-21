@@ -37,19 +37,28 @@
     <h1>Vehicles</h1>
 
     <!-- Search Form -->
-    <form action="/" method="post">
-        <input type="text" name="search" placeholder="Search by make or model" value="{{ search }}">
+    <form action="/" method="get">
+        <select name="search_param" id="search_param">
+            {% set search_params = ['Make', 'Model', 'Type', 'NearestAirportCity', 'LocationCity', 'LocationState', 'LocationCountry', 'FuelType'] %}
+            {% for param in search_params %}
+            <option value="{{ param }}" {% if search_param == param %}selected{% endif %}>
+                {{ param }}  <!-- Adjust the display text if needed -->
+            </option>
+            {% endfor %}
+        </select>
+        <input type="text" name="search" placeholder="Search" value="{{ search }}">
         <input type="submit" value="Search">
     </form>
+
     <nav>
         <ul class="pagination">
             <!-- Link to the first page -->
             <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=1, per_page=per_page) }}">First</a>
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">First</a>
             </li>
             <!-- Link to the previous page -->
             <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page-1, per_page=per_page) }}">Previous</a>
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page-1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Previous</a>
             </li>
             
             <!-- Display few pages around the current page -->
@@ -57,18 +66,18 @@
             {% for i in range(page-window, page+window+1) %}
                 {% if i > 0 and i <= total_pages %}
                     <li class="page-item {% if i == page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=i, per_page=per_page) }}">{{ i }}</a>
+                        <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=i, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search')) }}">{{ i }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
     
             <!-- Link to the next page -->
             <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page+1, per_page=per_page) }}">Next</a>
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page+1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Next</a>
             </li>
             <!-- Link to the last page -->
             <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=total_pages, per_page=per_page) }}">Last</a>
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=total_pages, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Last</a>
             </li>
         </ul>
     </nav>
@@ -83,7 +92,7 @@
                         {% set current_order = request.args.get('order') %}
                         {% set sort_order = 'desc' if current_order == 'asc' and current_sort == column else 'asc' %}
                         <th>
-                            <a href="{{ url_for('index', sort=column, order=sort_order, page=request.args.get('page', 1), per_page=request.args.get('per_page', 50)) }}">{{ column.replace('NearestAirportCity', 'Nearest Airport').replace('LocationCity', 'Location City').replace('LocationState', 'State').replace('LocationCountry', 'Country').replace('FuelType', 'Fuel Type').replace('RenterTripsTaken', 'Renter Trips Taken').replace('ReviewCount', 'Review Count').replace('RateDaily', 'Rate/Daily') }}</a>
+                            <a href="{{ url_for('index', sort=column, order=sort_order, page=request.args.get('page', 1), per_page=request.args.get('per_page', 50), search_param=request.args.get('search_param'), search=request.args.get('search'))}}">{{ column.replace('NearestAirportCity', 'Nearest Airport').replace('LocationCity', 'Location City').replace('LocationState', 'State').replace('LocationCountry', 'Country').replace('FuelType', 'Fuel Type').replace('RenterTripsTaken', 'Renter Trips Taken').replace('ReviewCount', 'Review Count').replace('RateDaily', 'Rate/Daily') }}</a>
                         </th>
                     {% endfor %}
                 </tr>

@@ -23,8 +23,11 @@ def get_db_connection():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    search_param = 'Make'
     search = ''
-    search = request.form.get('search', '')  # The search term from the form
+    search_param = request.args.get('search_param', 'Make')
+    search = request.args.get('search', '')
+
     # Get sort and search parameters from the query string
     sort = request.args.get('sort', 'VehicleID')  # Default sort by VehicleID
     order = request.args.get('order', 'asc')  # Default sort order
@@ -66,8 +69,18 @@ def index():
     """
     # If there is a search term, add a WHERE clause to the SQL query
     if search:
-        query += " WHERE Make LIKE %s OR Model LIKE %s"
-        numberOfRows += " WHERE Make LIKE %s OR Model LIKE %s"
+        temp_search_param = ''
+        if search_param == 'LocationCity':
+           temp_search_param = 'City'
+        elif search_param == 'LocationState':
+            temp_search_param = 'State'
+        elif search_param == 'LocationCountry':
+            temp_search_param = 'Country'
+        else:
+            temp_search_param = search_param
+
+        query += f" WHERE {temp_search_param} LIKE %s"
+        numberOfRows += f" WHERE {temp_search_param} LIKE %s"
         search_pattern = f"%{search}%"
     
     # Add ORDER BY clause to SQL query
@@ -85,13 +98,13 @@ def index():
     conn = get_db_connection()
     cursor = conn.cursor()
     if search:
-        cursor.execute(paginated_query, (search_pattern, search_pattern, per_page, offset))
+        cursor.execute(paginated_query, (search_pattern, per_page, offset))
     else:
         cursor.execute(paginated_query, (per_page, offset))
     vehicles = cursor.fetchall()
     
     if search:
-        cursor.execute(numberOfRows, (search_pattern, search_pattern))
+        cursor.execute(numberOfRows, (search_pattern))
     else:
         cursor.execute(numberOfRows)
     count_result = cursor.fetchone()
@@ -104,7 +117,7 @@ def index():
 
     total_pages = (total_count + per_page - 1) // per_page
 
-    return render_template('index.html', vehicles=vehicles, sort=sort, order=order, search=search, page=page, total_pages=total_pages, per_page=per_page)
+    return render_template('index.html', vehicles=vehicles, sort=sort, order=order, search_param=search_param, search=search, page=page, total_pages=total_pages, per_page=per_page)
 
 
 if __name__ == "__main__":
