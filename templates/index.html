@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vehicles List</title>
+    <title>Car Rental</title>
     <!-- Include Bootstrap CSS for styling -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
@@ -17,7 +17,18 @@
         body{
             margin: 10px;
         }
+        body form{
+            margin-bottom: 10px;
+        }
     </style>
+    <!-- Add script to handle per_page change -->
+    <script>
+        document.addEventListener('change', function (e) {
+            if (e.target.id === 'per_page') {
+                window.location.href = `{{ url_for('index') }}?page=1&per_page=${e.target.value}`;
+            }
+        });
+    </script>
 </head>
 <body>
     <h1>Vehicles List</h1>
@@ -27,7 +38,17 @@
         <input type="text" name="search" placeholder="Search by make or model" value="{{ search }}">
         <input type="submit" value="Search">
     </form>
-
+    <nav>
+        <ul class="pagination">
+            {% for i in range(1, total_pages + 1) %}
+                {% if i == page %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('index', sort=request.args.get('sort', 'VehicleID'), order=request.args.get('order', 'asc'), page=i, per_page=per_page) }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
     <!-- Vehicles Table in a Scrollable Div -->
     <div class="table-responsive">
         <table class="table">
@@ -38,7 +59,7 @@
                         {% set current_order = request.args.get('order') %}
                         {% set sort_order = 'desc' if current_order == 'asc' and current_sort == column else 'asc' %}
                         <th>
-                            <a href="{{ url_for('index', sort=column, order=sort_order) }}">{{ column.replace('NearestAirportCity', 'Nearest Airport').replace('LocationCity', 'Location City').replace('LocationState', 'State').replace('LocationCountry', 'Country').replace('FuelType', 'Fuel Type').replace('RenterTripsTaken', 'Renter Trips Taken').replace('ReviewCount', 'Review Count').replace('RateDaily', 'Rate/Daily') }}</a>
+                            <a href="{{ url_for('index', sort=column, order=sort_order, page=request.args.get('page', 1), per_page=request.args.get('per_page', 50)) }}">{{ column.replace('NearestAirportCity', 'Nearest Airport').replace('LocationCity', 'Location City').replace('LocationState', 'State').replace('LocationCountry', 'Country').replace('FuelType', 'Fuel Type').replace('RenterTripsTaken', 'Renter Trips Taken').replace('ReviewCount', 'Review Count').replace('RateDaily', 'Rate/Daily') }}</a>
                         </th>
                     {% endfor %}
                 </tr>
@@ -69,5 +90,11 @@
             </tbody>
         </table>
     </div>
+    <!-- Place this dropdown wherever you want to allow the user to change rows per page -->
+    <select id="per_page" name="per_page">
+        <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+        <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+        <option value="150" {% if per_page == 150 %}selected{% endif %}>150</option>
+    </select>
 </body>
 </html>

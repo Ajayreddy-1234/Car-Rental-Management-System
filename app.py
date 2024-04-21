@@ -54,26 +54,57 @@ def index():
     LEFT JOIN RentalActivity r ON v.VehicleID = r.VehicleID
     """
 
+    numberOfRows = """
+    SELECT 
+        COUNT(*)
+    FROM 
+        Vehicles v
+    LEFT JOIN Locations l ON v.LocationID = l.LocationID
+    LEFT JOIN FuelTypes f ON v.FuelTypeID = f.FuelTypeID
+    LEFT JOIN Owners o ON v.OwnerID = o.OwnerID
+    LEFT JOIN RentalActivity r ON v.VehicleID = r.VehicleID
+    """
     # If there is a search term, add a WHERE clause to the SQL query
     if search:
         query += " WHERE Make LIKE %s OR Model LIKE %s"
+        numberOfRows += " WHERE Make LIKE %s OR Model LIKE %s"
         search_pattern = f"%{search}%"
     
     # Add ORDER BY clause to SQL query
     query += f" ORDER BY {sort} {order}"
 
+    # Pagination parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 50, type=int)
+    offset = (page - 1) * per_page
+
+    # Add limit and offset to your query
+    paginated_query = query + " LIMIT %s OFFSET %s"
+
     # Execute the query with search terms if applicable
     conn = get_db_connection()
     cursor = conn.cursor()
     if search:
-        cursor.execute(query, (search_pattern, search_pattern))
+        cursor.execute(paginated_query, (search_pattern, search_pattern, per_page, offset))
     else:
-        cursor.execute(query)
+        cursor.execute(paginated_query, (per_page, offset))
     vehicles = cursor.fetchall()
+    
+    if search:
+        cursor.execute(numberOfRows, (search_pattern, search_pattern))
+    else:
+        cursor.execute(numberOfRows)
+    count_result = cursor.fetchone()
+
+    # Extract the total count from the result
+    total_count = count_result['COUNT(*)'] if count_result else 0
+
     cursor.close()
     conn.close()
 
-    return render_template('index.html', vehicles=vehicles, sort=sort, order=order, search=search)
+    total_pages = (total_count + per_page - 1) // per_page
+
+    return render_template('index.html', vehicles=vehicles, sort=sort, order=order, search=search, page=page, total_pages=total_pages, per_page=per_page)
 
 
 if __name__ == "__main__":
