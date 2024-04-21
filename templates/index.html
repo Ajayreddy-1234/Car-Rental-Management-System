@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Car Rental</title>
+    <title>Car Rental Management System</title>
     <!-- Include Bootstrap CSS for styling -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
@@ -20,6 +20,9 @@
         body form{
             margin-bottom: 10px;
         }
+        .table-responsive{
+            margin-bottom: 15px;
+        }
     </style>
     <!-- Add script to handle per_page change -->
     <script>
@@ -31,7 +34,7 @@
     </script>
 </head>
 <body>
-    <h1>Vehicles List</h1>
+    <h1>Vehicles</h1>
 
     <!-- Search Form -->
     <form action="/" method="post">
@@ -40,15 +43,36 @@
     </form>
     <nav>
         <ul class="pagination">
-            {% for i in range(1, total_pages + 1) %}
-                {% if i == page %}
-                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
-                {% else %}
-                    <li class="page-item"><a class="page-link" href="{{ url_for('index', sort=request.args.get('sort', 'VehicleID'), order=request.args.get('order', 'asc'), page=i, per_page=per_page) }}">{{ i }}</a></li>
+            <!-- Link to the first page -->
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=1, per_page=per_page) }}">First</a>
+            </li>
+            <!-- Link to the previous page -->
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page-1, per_page=per_page) }}">Previous</a>
+            </li>
+            
+            <!-- Display few pages around the current page -->
+            {% set window = 2 %} <!-- Number of pages to show around the current page -->
+            {% for i in range(page-window, page+window+1) %}
+                {% if i > 0 and i <= total_pages %}
+                    <li class="page-item {% if i == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=i, per_page=per_page) }}">{{ i }}</a>
+                    </li>
                 {% endif %}
             {% endfor %}
+    
+            <!-- Link to the next page -->
+            <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page+1, per_page=per_page) }}">Next</a>
+            </li>
+            <!-- Link to the last page -->
+            <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=total_pages, per_page=per_page) }}">Last</a>
+            </li>
         </ul>
     </nav>
+    
     <!-- Vehicles Table in a Scrollable Div -->
     <div class="table-responsive">
         <table class="table">
