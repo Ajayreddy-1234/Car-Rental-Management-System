@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vehicles List</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table-responsive {
+            max-height: 600px; /* Adjust based on your screen size */
+            overflow-y: auto;
+        }
+        th, td {
+            padding: 8px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+        body{
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vehicles List</h1>
+
+    <!-- Search Form -->
+    <form action="/" method="post">
+        <input type="text" name="search" placeholder="Search by make or model" value="{{ search }}">
+        <input type="submit" value="Search">
+    </form>
+
+    <!-- Vehicles Table in a Scrollable Div -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for column in ['Make', 'Model', 'Year', 'Type', 'RateDaily', 'NearestAirportCity', 'LocationCity', 'LocationState', 'LocationCountry', 'FuelType', 'Rating', 'RenterTripsTaken', 'ReviewCount'] %}
+                        {% set current_sort = request.args.get('sort') %}
+                        {% set current_order = request.args.get('order') %}
+                        {% set sort_order = 'desc' if current_order == 'asc' and current_sort == column else 'asc' %}
+                        <th>
+                            <a href="{{ url_for('index', sort=column, order=sort_order) }}">{{ column.replace('NearestAirportCity', 'Nearest Airport').replace('LocationCity', 'Location City').replace('LocationState', 'State').replace('LocationCountry', 'Country').replace('FuelType', 'Fuel Type').replace('RenterTripsTaken', 'Renter Trips Taken').replace('ReviewCount', 'Review Count').replace('RateDaily', 'Rate/Daily') }}</a>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehicle in vehicles %}
+                <tr>
+                    <td>{{ vehicle['Make'] }}</td>
+                    <td>{{ vehicle['Model'] }}</td>
+                    <td>{{ vehicle['Year'] }}</td>
+                    <td>{{ vehicle['Type'] }}</td>
+                    <td>{{ vehicle['RateDaily'] }}</td>
+                    <td>{{ vehicle['NearestAirportCity'] }}</td>
+                    <td>{{ vehicle['LocationCity'] }}</td>
+                    <td>{{ vehicle['LocationState'] }}</td>
+                    <td>{{ vehicle['LocationCountry'] }}</td>
+                    <td>{{ vehicle['FuelType'] }}</td>
+                    <td>{{ vehicle['Rating'] }}</td>
+                    <td>{{ vehicle['RenterTripsTaken'] }}</td>
+                    <td>{{ vehicle['ReviewCount'] }}</td>
+                    
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10">No vehicles found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
