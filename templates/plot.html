@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plot View</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas {
+            max-height: 80vh; /* Set the maximum height of the canvas to 80% of the viewport height */
+            width: 100%; /* Make the canvas width fill its container */
+            margin: auto; /* Center the canvas horizontally */
+            display: block; /* Ensure canvas is treated as a block-level element */
+        }
+        a {
+            margin-top: 15px !important;
+        }
+        body {
+          margin-left: 10px;
+          margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Plot View</h1>
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+    <script>
+        var ctx = document.getElementById('myChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ x_data | tojson | safe }}, // X-axis data
+                datasets: [{
+                    label: 'Vehicles Available By State',
+                    data: {{ y_data | tojson | safe }}, // Y-axis data
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+    <!-- Button to go back to the table view -->
+    <a href="{{ url_for('index', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" class="btn btn-primary">Back to Table View</a>
+</body>
+</html>

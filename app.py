@@ -119,6 +119,53 @@ def index():
 
     return render_template('index.html', vehicles=vehicles, sort=sort, order=order, search_param=search_param, search=search, page=page, total_pages=total_pages, per_page=per_page)
 
+@app.route('/plot')
+def plot_view():
+    search_param = request.args.get('search_param', 'Make')
+    search = request.args.get('search', '')
+
+    query = """
+    SELECT 
+        COUNT(*),
+        l.State as LocationState
+    FROM 
+        Vehicles v
+    LEFT JOIN Locations l ON v.LocationID = l.LocationID
+    LEFT JOIN FuelTypes f ON v.FuelTypeID = f.FuelTypeID
+    LEFT JOIN Owners o ON v.OwnerID = o.OwnerID
+    LEFT JOIN RentalActivity r ON v.VehicleID = r.VehicleID
+    """
+    if search:
+        temp_search_param = ''
+        if search_param == 'LocationCity':
+           temp_search_param = 'City'
+        elif search_param == 'LocationState':
+            temp_search_param = 'State'
+        elif search_param == 'LocationCountry':
+            temp_search_param = 'Country'
+        else:
+            temp_search_param = search_param
+
+        query += f" WHERE {temp_search_param} LIKE %s"
+        search_pattern = f"%{search}%"
+    query += " GROUP BY State"
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    if search:
+        cursor.execute(query, (search_pattern))
+    else:
+        cursor.execute(query)
+    
+    vehicleDataByState = cursor.fetchall()
+    x_data = []
+    y_data = []
+
+    for item in vehicleDataByState:
+        x_data.append(item['LocationState'])
+        y_data.append(item['COUNT(*)'])
+
+    return render_template('plot.html', x_data=x_data, y_data=y_data)
 
 if __name__ == "__main__":
     app.run(debug=True)

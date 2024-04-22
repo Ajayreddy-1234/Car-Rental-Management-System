@@ -33,6 +33,9 @@
             padding: 0;
             margin-left: auto;
         }
+        #viewplot{
+            margin-bottom: 10px;
+        }
     </style>
     <!-- Add script to handle per_page change -->
     <script>
@@ -67,6 +70,9 @@
         <input type="text" name="search" placeholder="Search" value="{{ search }}">
         <input type="submit" value="Search">
     </form>
+    <!-- Add this in your index.html where appropriate -->
+    <a href="{{ url_for('plot_view', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Plot</a>
+
     <div class = "navpagecontainer">
         <nav>
             <ul class="pagination">
