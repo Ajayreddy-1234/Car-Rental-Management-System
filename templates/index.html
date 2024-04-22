@@ -36,10 +36,18 @@
     </style>
     <!-- Add script to handle per_page change -->
     <script>
-        document.addEventListener('change', function (e) {
-            if (e.target.id === 'per_page') {
-                window.location.href = `{{ url_for('index') }}?page=1&per_page=${e.target.value}`;
-            }
+         document.addEventListener('DOMContentLoaded', function () {
+            var currentSort = "{{ request.args.get('sort', 'VehicleID') }}";
+            var currentOrder = "{{ request.args.get('order', 'asc') }}";
+            var currentSearchParam = "{{ request.args.get('search_param', 'Make') }}";
+            var currentSearch = "{{ request.args.get('search', '') }}";
+            document.addEventListener('change', function (e) {
+                if (e.target.id === 'per_page') {
+                    var newPerPage = e.target.value;
+                    var newUrl = `?sort=${currentSort}&order=${currentOrder}&page=1&per_page=${newPerPage}&search_param=${currentSearchParam}&search=${currentSearch}`;
+                    window.location.href = newUrl;
+                }
+            });
         });
     </script>
 </head>
