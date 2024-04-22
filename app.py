@@ -194,7 +194,7 @@ def plot_view_1():
         else:
             temp_search_param = search_param
 
-        query += f" WHERE {temp_search_param} LIKE %s"
+        query += f" WHERE {temp_search_param} LIKE %s LIMIT 1000"
         search_pattern = f"%{search}%"
     
     conn = get_db_connection()

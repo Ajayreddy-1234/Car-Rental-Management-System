@@ -4,39 +4,8 @@
     <title>Car Rental Management System</title>
     <!-- Include Bootstrap CSS for styling -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .table-responsive {
-            max-height: 600px; /* Adjust based on your screen size */
-            overflow-y: auto;
-        }
-        th, td {
-            padding: 8px !important;
-            text-align: center;
-            white-space: nowrap;
-        }
-        body{
-            margin: 10px;
-        }
-        body form{
-            margin-bottom: 10px;
-        }
-        .table-responsive{
-            margin-bottom: 15px;
-        }
-        .navpagecontainer{
-            height: 38px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .navpagecontainer select{
-            padding: 0;
-            margin-left: auto;
-        }
-        #viewplot{
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="static/styles.css">
+
     <!-- Add script to handle per_page change -->
     <script>
          document.addEventListener('DOMContentLoaded', function () {
@@ -55,27 +24,30 @@
     </script>
 </head>
 <body>
-    <h1>Vehicles</h1>
+    <h1>Available Rentals</h1>
+    <div class="search-plot-container">
+        <!-- Search Form -->
+        <form action="/" method="get">
+            <select name="search_param" id="search_param">
+                {% set search_params = ['Make', 'Model', 'Type', 'NearestAirportCity', 'LocationCity', 'LocationState', 'LocationCountry', 'FuelType'] %}
+                {% for param in search_params %}
+                <option value="{{ param }}" {% if search_param == param %}selected{% endif %}>
+                    {{ param }}  <!-- Adjust the display text if needed -->
+                </option>
+                {% endfor %}
+            </select>
+            <input type="text" name="search" placeholder="Search" value="{{ search }}">
+            <input type="submit" value="Search">
+        </form>
 
-    <!-- Search Form -->
-    <form action="/" method="get">
-        <select name="search_param" id="search_param">
-            {% set search_params = ['Make', 'Model', 'Type', 'NearestAirportCity', 'LocationCity', 'LocationState', 'LocationCountry', 'FuelType'] %}
-            {% for param in search_params %}
-            <option value="{{ param }}" {% if search_param == param %}selected{% endif %}>
-                {{ param }}  <!-- Adjust the display text if needed -->
-            </option>
-            {% endfor %}
-        </select>
-        <input type="text" name="search" placeholder="Search" value="{{ search }}">
-        <input type="submit" value="Search">
-    </form>
-    <!-- Add this in your index.html where appropriate -->
-    <a href="{{ url_for('plot_view', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Bar Plot</a>
+        <div class="plot-buttons">
+            <!-- Add this in your index.html where appropriate -->
+            <a href="{{ url_for('plot_view', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Bar Plot</a>
 
-    <!-- Add this in your index.html where appropriate -->
-    <a href="{{ url_for('plot_view_1', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Scatter Plot</a>
-
+            <!-- Add this in your index.html where appropriate -->
+            <a href="{{ url_for('plot_view_1', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Scatter Plot</a>
+        </div>
+    </div>
     <div class = "navpagecontainer">
         <nav>
             <ul class="pagination">

@@ -1,0 +1,22 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: white; /* Cream color background */
+    margin-left: 10px;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+canvas {
+    max-height: 80vh; /* Set the maximum height of the canvas to 80% of the viewport height */
+    width: 100%; /* Make the canvas width fill its container */
+    margin: auto; /* Center the canvas horizontally */
+    display: block; /* Ensure canvas is treated as a block-level element */
+}
+a {
+    margin-top: 15px !important;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}

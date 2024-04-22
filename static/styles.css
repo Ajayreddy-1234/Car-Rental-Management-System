@@ -1,0 +1,115 @@
+/* styles.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5dc; /* Cream color background */
+    margin: 0;
+    padding: 10px;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+.table-responsive {
+    max-height: 600px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    border-radius: 8px; /* Rounded corners for the table container */
+    margin-bottom: 15px;
+}
+
+.table {
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for table */
+}
+
+th, td {
+    padding: 8px !important;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 4px; /* Rounded corners for table cells */
+}
+
+th {
+    background-color: white; /* Bootstrap primary color */
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Zebra striping for table rows */
+}
+
+.navpagecontainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+}
+
+.navpagecontainer .pagination {
+    border-radius: 8px;
+}
+
+.navpagecontainer nav{
+    height: 38px;
+}
+
+.page-link {
+    color: #007bff;
+    border-radius: 4px; /* Rounded corners for pagination links */
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+
+/* Style for dropdown and search input */
+select, input[type="text"] {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    margin-right: 8px;
+}
+
+input[type="submit"] {
+    background-color: #28a745; /* Bootstrap success color */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Button styles */
+.btn-primary {
+    margin-right: 8px;
+    border-radius: 4px; /* Rounded corners for buttons */
+}
+
+body form{
+    margin-bottom: 10px;
+}
+
+#viewplot{
+    margin-bottom: 20px;
+}
+
+.search-plot-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Aligns items vertically center */
+}
+
+.search-form {
+    flex-grow: 1; /* Allows the search form to take up available space */
+}
+
