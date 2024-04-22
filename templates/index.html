@@ -23,6 +23,16 @@
         .table-responsive{
             margin-bottom: 15px;
         }
+        .navpagecontainer{
+            height: 38px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .navpagecontainer select{
+            padding: 0;
+            margin-left: auto;
+        }
     </style>
     <!-- Add script to handle per_page change -->
     <script>
@@ -49,38 +59,45 @@
         <input type="text" name="search" placeholder="Search" value="{{ search }}">
         <input type="submit" value="Search">
     </form>
-
-    <nav>
-        <ul class="pagination">
-            <!-- Link to the first page -->
-            <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">First</a>
-            </li>
-            <!-- Link to the previous page -->
-            <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page-1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Previous</a>
-            </li>
-            
-            <!-- Display few pages around the current page -->
-            {% set window = 2 %} <!-- Number of pages to show around the current page -->
-            {% for i in range(page-window, page+window+1) %}
-                {% if i > 0 and i <= total_pages %}
-                    <li class="page-item {% if i == page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=i, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search')) }}">{{ i }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-    
-            <!-- Link to the next page -->
-            <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page+1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Next</a>
-            </li>
-            <!-- Link to the last page -->
-            <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=total_pages, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Last</a>
-            </li>
-        </ul>
-    </nav>
+    <div class = "navpagecontainer">
+        <nav>
+            <ul class="pagination">
+                <!-- Link to the first page -->
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">First</a>
+                </li>
+                <!-- Link to the previous page -->
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page-1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Previous</a>
+                </li>
+                
+                <!-- Display few pages around the current page -->
+                {% set window = 2 %} <!-- Number of pages to show around the current page -->
+                {% for i in range(page-window, page+window+1) %}
+                    {% if i > 0 and i <= total_pages %}
+                        <li class="page-item {% if i == page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=i, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search')) }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+        
+                <!-- Link to the next page -->
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=page+1, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Next</a>
+                </li>
+                <!-- Link to the last page -->
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('index', sort=request.args.get('sort'), order=request.args.get('order'), page=total_pages, per_page=per_page, search_param=request.args.get('search_param'), search=request.args.get('search'))}}">Last</a>
+                </li>
+            </ul>
+        </nav>
+        <!-- Place this dropdown wherever you want to allow the user to change rows per page -->
+        <select id="per_page" name="per_page">
+            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+            <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+            <option value="150" {% if per_page == 150 %}selected{% endif %}>150</option>
+        </select>
+    </div>
     
     <!-- Vehicles Table in a Scrollable Div -->
     <div class="table-responsive">
@@ -123,11 +140,6 @@
             </tbody>
         </table>
     </div>
-    <!-- Place this dropdown wherever you want to allow the user to change rows per page -->
-    <select id="per_page" name="per_page">
-        <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
-        <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
-        <option value="150" {% if per_page == 150 %}selected{% endif %}>150</option>
-    </select>
+
 </body>
 </html>
