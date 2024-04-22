@@ -24,10 +24,15 @@
     </script>
 </head>
 <body>
-    <h1>Available Rentals</h1>
+    <div class="h1-username-container">
+        <h1 class="availableRentals">Available Rentals</h1>
+        <div class="username-display">
+            {{ request.args.get('username', 'ajayreddy') }}
+        </div>
+    </div>
     <div class="search-plot-container">
         <!-- Search Form -->
-        <form action="/" method="get">
+        <form action="/" method="get" class="search-form">
             <select name="search_param" id="search_param">
                 {% set search_params = ['Make', 'Model', 'Type', 'NearestAirportCity', 'LocationCity', 'LocationState', 'LocationCountry', 'FuelType'] %}
                 {% for param in search_params %}

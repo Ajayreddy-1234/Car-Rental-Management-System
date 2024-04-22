@@ -113,3 +113,24 @@ body form{
     flex-grow: 1; /* Allows the search form to take up available space */
 }
 
+.username-display {
+    text-align: right;
+    padding: 10px;
+    margin: 0px;
+    color:#007bff;
+    text-decoration: underline;
+}
+
+
+.h1-username-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Aligns items vertically center */
+}
+
+.availableRentals{
+    flex-grow: 1;
+    margin: 0px;
+    padding: 0px;
+}
+

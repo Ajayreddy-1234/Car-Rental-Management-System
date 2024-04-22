@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, redirect, render_template, request, url_for
 import pymysql
 
 
@@ -25,6 +25,7 @@ def get_db_connection():
 def index():
     search_param = 'Make'
     search = ''
+    username = request.args.get('username', 'ajayreddy')
     search_param = request.args.get('search_param', 'Make')
     search = request.args.get('search', '')
 
@@ -117,7 +118,7 @@ def index():
 
     total_pages = (total_count + per_page - 1) // per_page
 
-    return render_template('index.html', vehicles=vehicles, sort=sort, order=order, search_param=search_param, search=search, page=page, total_pages=total_pages, per_page=per_page)
+    return render_template('index.html', vehicles=vehicles, sort=sort, order=order, search_param=search_param, search=search, page=page, total_pages=total_pages, per_page=per_page, username=username)
 
 @app.route('/plot')
 def plot_view():
@@ -207,6 +208,13 @@ def plot_view_1():
     vehicles = cursor.fetchall()
 
     return render_template('plot_2.html', vehicles = vehicles)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        return redirect(url_for('index', username=username))
+    return render_template('login.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
