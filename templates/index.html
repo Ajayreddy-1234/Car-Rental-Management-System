@@ -71,7 +71,10 @@
         <input type="submit" value="Search">
     </form>
     <!-- Add this in your index.html where appropriate -->
-    <a href="{{ url_for('plot_view', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Plot</a>
+    <a href="{{ url_for('plot_view', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Bar Plot</a>
+
+    <!-- Add this in your index.html where appropriate -->
+    <a href="{{ url_for('plot_view_1', search_param=request.args.get('search_param'), search=request.args.get('search')) }}" id ="viewplot" class="btn btn-primary">View Scatter Plot</a>
 
     <div class = "navpagecontainer">
         <nav>

@@ -167,5 +167,46 @@ def plot_view():
 
     return render_template('plot.html', x_data=x_data, y_data=y_data)
 
+@app.route('/plotScatter')
+def plot_view_1():
+    search_param = request.args.get('search_param', 'Make')
+    search = request.args.get('search', '')
+
+    query = """
+    SELECT 
+        r.RenterTripsTaken,
+        r.Rating
+    FROM 
+        Vehicles v
+    LEFT JOIN Locations l ON v.LocationID = l.LocationID
+    LEFT JOIN FuelTypes f ON v.FuelTypeID = f.FuelTypeID
+    LEFT JOIN Owners o ON v.OwnerID = o.OwnerID
+    LEFT JOIN RentalActivity r ON v.VehicleID = r.VehicleID
+    """
+    if search:
+        temp_search_param = ''
+        if search_param == 'LocationCity':
+           temp_search_param = 'City'
+        elif search_param == 'LocationState':
+            temp_search_param = 'State'
+        elif search_param == 'LocationCountry':
+            temp_search_param = 'Country'
+        else:
+            temp_search_param = search_param
+
+        query += f" WHERE {temp_search_param} LIKE %s"
+        search_pattern = f"%{search}%"
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    if search:
+        cursor.execute(query, (search_pattern))
+    else:
+        cursor.execute(query)
+    
+    vehicles = cursor.fetchall()
+
+    return render_template('plot_2.html', vehicles = vehicles)
+
 if __name__ == "__main__":
     app.run(debug=True)
