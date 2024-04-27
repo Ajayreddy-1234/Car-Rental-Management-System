@@ -216,5 +216,216 @@ def login():
         return redirect(url_for('index', username=username))
     return render_template('login.html')
 
+@app.route('/create', methods=["POST"])
+def create():
+    # Add Creation Logic from Form Data
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            # Insert or ignore into FuelTypes
+            sql = "INSERT IGNORE INTO FuelTypes (FuelType) VALUES (%s)"
+            cursor.execute(sql, (request.form['FuelType'],))
+            connection.commit()
+
+            # Get FuelTypeID
+            sql = "SELECT FuelTypeID FROM FuelTypes WHERE FuelType = %s"
+            cursor.execute(sql, (request.form['FuelType'],))
+            fuel_type_id = cursor.fetchone()['FuelTypeID']
+
+            # Insert into Locations
+            sql = """
+                INSERT INTO Locations (Latitude, Longitude, City, State, Country)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (request.form['Latitude'], request.form['Longitude'], request.form['LocationCity'], request.form['LocationState'], request.form['LocationCountry']))
+            location_id = connection.insert_id()
+            connection.commit()
+
+            # Insert into Owners (assuming you know the owner or create new)
+            sql = "INSERT INTO Owners () VALUES ()"
+            cursor.execute(sql)
+            owner_id = connection.insert_id()
+            connection.commit()
+
+            # Insert into Vehicles
+            sql = """
+                INSERT INTO Vehicles (Make, Model, Type, Year, FuelTypeID, RateDaily, OwnerID, LocationID, NearestAirportCity)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (request.form['Make'], request.form['Model'], request.form['Type'], request.form['Year'], fuel_type_id, request.form['RateDaily'], owner_id, location_id, request.form['NearestAirportCity']))
+            vehicle_id = connection.insert_id()
+            connection.commit()
+
+            # Insert into RentalActivity if applicable
+            sql = """
+                INSERT INTO RentalActivity (VehicleID, RenterTripsTaken, ReviewCount, Rating)
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(sql, (vehicle_id, request.form.get('RenterTripsTaken', 0), request.form.get('ReviewCount', 0), request.form.get('Rating', 0)))
+            connection.commit()
+
+    finally:
+        connection.close()
+    
+    return redirect(url_for('index')) 
+
+@app.route('/create_vehicle')
+def create_vehicle():
+    return render_template('create.html')
+
+@app.route('/edit', methods=['POST'])
+def edit():
+    connection = get_db_connection()
+    vehicle_id = request.form['vehicle_id']
+
+    try:
+        with connection.cursor() as cursor:
+            # Update FuelTypes table if necessary
+            if 'FuelType' in request.form:
+                # Ensure the FuelType exists or insert new
+                sql = """
+                INSERT INTO FuelTypes (FuelType) 
+                VALUES (%s) ON DUPLICATE KEY UPDATE FuelTypeID=LAST_INSERT_ID(FuelTypeID)
+                """
+                cursor.execute(sql, (request.form['FuelType'],))
+                fuel_type_id = connection.insert_id()
+                connection.commit()
+
+                # Update Vehicles table with the new FuelTypeID
+                sql = "UPDATE Vehicles SET FuelTypeID = %s WHERE VehicleID = %s"
+                cursor.execute(sql, (fuel_type_id, vehicle_id))
+
+            # Update Locations table if necessary
+            if all(key in request.form for key in ['Latitude', 'Longitude', 'LocationCity', 'LocationState', 'LocationCountry']):
+                sql = """
+                UPDATE Locations
+                SET Latitude = %s, Longitude = %s, City = %s, State = %s, Country = %s
+                WHERE LocationID = (SELECT LocationID FROM Vehicles WHERE VehicleID = %s)
+                """
+                cursor.execute(sql, (request.form['Latitude'], request.form['Longitude'], request.form['LocationCity'], request.form['LocationState'], request.form['LocationCountry'], vehicle_id))
+
+            # Update Vehicles table
+            sql = """
+            UPDATE Vehicles
+            SET Make = %s, Model = %s, Type = %s, Year = %s, RateDaily = %s, NearestAirportCity = %s
+            WHERE VehicleID = %s
+            """
+            cursor.execute(sql, (
+                request.form['Make'], request.form['Model'], request.form['Type'], 
+                request.form['Year'], request.form['RateDaily'], request.form['NearestAirportCity'], 
+                vehicle_id
+            ))
+
+            # Update RentalActivity table if necessary
+            if any(key in request.form for key in ['RenterTripsTaken', 'ReviewCount', 'Rating']):
+                sql = """
+                UPDATE RentalActivity
+                SET RenterTripsTaken = %s, ReviewCount = %s, Rating = %s
+                WHERE VehicleID = %s
+                """
+                cursor.execute(sql, (
+                    request.form.get('RenterTripsTaken', 0), 
+                    request.form.get('ReviewCount', 0), 
+                    request.form.get('Rating', 0), 
+                    vehicle_id
+                ))
+
+            connection.commit()
+    except Exception as e:
+        print("An error occurred:", e)
+        connection.rollback()
+    finally:
+        connection.close()
+        return redirect(url_for('index'))
+
+@app.route('/get_vehicle/<int:id>')
+def get_vehicle(id):
+    # Retrieve the vehicle data from the database
+    vehicle = get_vehicle_by_id(id)
+    return render_template('Edit.html', vehicle=vehicle)
+
+@app.route('/delete/<int:id>', methods=['GET'])
+def delete(id):
+        # Assuming you get form data to update the vehicle
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            # Check if the vehicle exists and fetch associated LocationID and OwnerID
+            sql = "SELECT LocationID, OwnerID FROM Vehicles WHERE VehicleID = %s"
+            cursor.execute(sql, (id,))
+            result = cursor.fetchone()
+            if result is None:
+                return "Vehicle not found", 404
+
+            location_id = result['LocationID']
+            owner_id = result['OwnerID']
+
+            # Delete from RentalActivity first
+            sql = "DELETE FROM RentalActivity WHERE VehicleID = %s"
+            cursor.execute(sql, (id,))
+
+            # Delete the vehicle itself
+            sql = "DELETE FROM Vehicles WHERE VehicleID = %s"
+            cursor.execute(sql, (id,))
+            
+            # Check if no other vehicles are linked to this LocationID and delete if not
+            sql = "SELECT COUNT(*) AS count FROM Vehicles WHERE LocationID = %s"
+            cursor.execute(sql, (location_id,))
+            if cursor.fetchone()['count'] == 0:
+                sql = "DELETE FROM Locations WHERE LocationID = %s"
+                cursor.execute(sql, (location_id,))
+
+            # Check if no other vehicles are linked to this OwnerID and delete if not
+            sql = "SELECT COUNT(*) AS count FROM Vehicles WHERE OwnerID = %s"
+            cursor.execute(sql, (owner_id,))
+            if cursor.fetchone()['count'] == 0:
+                sql = "DELETE FROM Owners WHERE OwnerID = %s"
+                cursor.execute(sql, (owner_id,))
+
+            connection.commit()
+    except Exception as e:
+        print("An error occurred:", e)
+        connection.rollback()
+        return "Error during deletion", 500
+    finally:
+        connection.close()
+        return redirect(url_for('index'))
+
+def get_vehicle_by_id(vehicle_id):
+    # get Vehicle By ID
+    query = f"""
+        SELECT 
+        v.VehicleID, 
+        v.Make, 
+        v.Model, 
+        v.Type, 
+        v.Year, 
+        v.RateDaily, 
+        v.NearestAirportCity,
+        l.Latitude,
+        l.Longitude, 
+        l.City as LocationCity,
+        l.State as LocationState,
+        l.Country as LocationCountry,
+        f.FuelType,
+        o.OwnerID,
+        r.RenterTripsTaken,
+        r.ReviewCount,
+        r.Rating
+        FROM 
+            Vehicles v
+        LEFT JOIN Locations l ON v.LocationID = l.LocationID
+        LEFT JOIN FuelTypes f ON v.FuelTypeID = f.FuelTypeID
+        LEFT JOIN Owners o ON v.OwnerID = o.OwnerID
+        LEFT JOIN RentalActivity r ON v.VehicleID = r.VehicleID
+        WHERE v.VehicleID = {vehicle_id}
+        """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    vehicle = cursor.fetchone()
+
+    return vehicle
+
 if __name__ == "__main__":
     app.run(debug=True)
