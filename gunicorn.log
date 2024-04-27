@@ -1,0 +1,23 @@
+[2024-04-23 16:00:23 +0000] [26771] [INFO] Starting gunicorn 22.0.0
+[2024-04-23 16:00:23 +0000] [26771] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2024-04-23 16:00:23 +0000] [26771] [ERROR] Retrying in 1 second.
+[2024-04-23 16:00:24 +0000] [26771] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2024-04-23 16:00:24 +0000] [26771] [ERROR] Retrying in 1 second.
+[2024-04-23 16:00:25 +0000] [26771] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2024-04-23 16:00:25 +0000] [26771] [ERROR] Retrying in 1 second.
+[2024-04-23 16:00:26 +0000] [26771] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2024-04-23 16:00:26 +0000] [26771] [ERROR] Retrying in 1 second.
+[2024-04-23 16:00:27 +0000] [26771] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2024-04-23 16:00:27 +0000] [26771] [ERROR] Retrying in 1 second.
+[2024-04-23 16:00:28 +0000] [26771] [ERROR] Can't connect to ('0.0.0.0', 8000)
+[2024-04-23 16:03:23 +0000] [26888] [INFO] Starting gunicorn 22.0.0
+[2024-04-23 16:03:23 +0000] [26888] [INFO] Listening at: http://0.0.0.0:8000 (26888)
+[2024-04-23 16:03:23 +0000] [26888] [INFO] Using worker: sync
+[2024-04-23 16:03:23 +0000] [26889] [INFO] Booting worker with pid: 26889
+[2024-04-23 16:03:23 +0000] [26890] [INFO] Booting worker with pid: 26890
+[2024-04-23 16:03:23 +0000] [26891] [INFO] Booting worker with pid: 26891
+[2024-04-23 16:04:03 +0000] [26888] [INFO] Handling signal: int
+[2024-04-23 16:04:03 +0000] [26889] [INFO] Worker exiting (pid: 26889)
+[2024-04-23 16:04:03 +0000] [26890] [INFO] Worker exiting (pid: 26890)
+[2024-04-23 16:04:03 +0000] [26891] [INFO] Worker exiting (pid: 26891)
+[2024-04-23 16:04:03 +0000] [26888] [INFO] Shutting down: Master
